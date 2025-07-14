@@ -1,5 +1,7 @@
 import 'package:compiler/api_services.dart';
+import 'package:compiler/editor.dart';
 import 'package:compiler/models/language.dart';
+import 'package:compiler/models/output.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -40,14 +42,24 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Future<List<Language>> languagesFuture;
   Language? selectedLanguage;
+  TextEditingController _codeController = TextEditingController();
+  TextEditingController _inputController = TextEditingController();
+  String _output = "Output will be displayed here";
   @override
   void initState() {
     super.initState();
     languagesFuture = ApiServices.fetchLanguages();
   }
-  void _runcode(){
+  void _runcode()async{
+    OutputResult outputResult=await ApiServices.runCode(
+      language: selectedLanguage!,
+      code: _codeController.text,
+      input: _inputController.text,
+    );
     setState(() {
-      // code to run
+      _output = outputResult.run.output.isNotEmpty
+          ? outputResult.run.output
+          : outputResult.run.stderr;
     });
   }
 
@@ -81,7 +93,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     items: languages.map((lang) {
                       return DropdownMenuItem<Language>(
                         value: lang,
-                        child: Text(lang.language, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
+                        child: Text(
+                          '${lang.language} (${lang.version})',
+                          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+                        ),
                       );
                     }).toList(),
                     onChanged: (Language? newLang) {
@@ -96,15 +111,61 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          IconButton(onPressed: _runcode, 
+          IconButton(
+            onPressed: _runcode,
             icon: Icon(Icons.play_arrow,),
           )
         ],
       ),
-      body: Center(
-        child: Text('Hello, World!'),
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        child:Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Editor(code: _codeController),
+            ),
+            SizedBox(width: 16.0),
+            Expanded(
+              flex: 1,
+              child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _inputController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Input',
+                  ),
+                  maxLines: null,
+                  
+                ),
+                SizedBox(height: 16.0),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(16.0),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Text(_output, style: TextStyle(fontFamily: 'Courier', fontSize: 16)),
+                    ),
+                  ),
+                ),
+              ],
+            )),
+          ],
+        ),
       ),
-      drawer: DrawerButton(),
+      drawer: Drawer(
+        child: Container(
+          padding: EdgeInsets.only(top: 20.0),
+          color: Theme.of(context).canvasColor,
+          child: Text("Files"),
+        ),
+      ),
     );
   }
 }
