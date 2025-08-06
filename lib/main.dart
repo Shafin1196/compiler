@@ -35,15 +35,18 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   late Future<List<Language>> languagesFuture;
   Language? selectedLanguage;
-  TextEditingController _codeController = TextEditingController();
-  TextEditingController _inputController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController(text: "");
+  final TextEditingController _inputController = TextEditingController();
   String _output = "Output will be displayed here";
   bool isSideBarOn = true;
   bool isLoading = false;
@@ -57,6 +60,26 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       isLoading = !isLoading;
     });
+    if (selectedLanguage == null) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Row(
+          children: [
+            Icon(Icons.error, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Please select a language',style: TextStyle(color: Colors.white,fontSize: 20,fontWeight: FontWeight.bold),),
+          ],
+        ),
+
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isLoading = !isLoading;
+      });
+      return;
+    }
     final outputResult = await ApiServices.runCode(
       language: selectedLanguage!,
       code: _codeController.text,
@@ -72,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Compiler'),
+        title: Text('CodeRunner'),
         elevation: 10,
         shadowColor: Theme.of(context).primaryColor.withOpacity(0.5),
         toolbarHeight: 40,
@@ -95,9 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 final languages = snapshot.data!;
                 return DropdownButtonHideUnderline(
                   child: DropdownButton<Language>(
-                    value: selectedLanguage ?? languages.first,
+                    value: selectedLanguage ?? (selectedLanguage = languages.first),
                     dropdownColor: Theme.of(context).canvasColor,
-                    icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                    icon: Icon(Icons.arrow_drop_down, color: Colors.grey.shade300),
                     items: languages.map((lang) {
                       return DropdownMenuItem<Language>(
                         value: lang,
@@ -169,17 +192,17 @@ class _MyHomePageState extends State<MyHomePage> {
                             keyboardType: TextInputType.multiline,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                                 borderSide:
                                     BorderSide(color: Colors.grey.shade300),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                                 borderSide:
                                     BorderSide(color: Colors.grey.shade300),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
                                     color:
                                         Colors.grey.shade300), // same as enabled
@@ -193,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Container(
                               padding: EdgeInsets.all(16.0),
                               width: double.infinity,
-                              height: 200,
+                              height:200,
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(8.0),
