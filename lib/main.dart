@@ -1,9 +1,10 @@
 import 'package:compiler/api_services.dart';
 import 'package:compiler/editor.dart';
 import 'package:compiler/models/language.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_neumorphic_plus/flutter_neumorphic.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
- 
+
 class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -44,31 +45,31 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController _codeController = TextEditingController();
   TextEditingController _inputController = TextEditingController();
   String _output = "Output will be displayed here";
-  bool isSideBarOn=true;
-  bool isLoading=false;
+  bool isSideBarOn = true;
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
     languagesFuture = ApiServices.fetchLanguages();
   }
-  void _runcode()async{
+
+  void _runcode() async {
     setState(() {
-      isLoading=!isLoading;
+      isLoading = !isLoading;
     });
-    final outputResult=await ApiServices.runCode(
+    final outputResult = await ApiServices.runCode(
       language: selectedLanguage!,
       code: _codeController.text,
       input: _inputController.text,
     );
     setState(() {
       _output = outputResult;
-      isLoading=!isLoading;
+      isLoading = !isLoading;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Compiler'),
@@ -82,7 +83,11 @@ class _MyHomePageState extends State<MyHomePage> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Center(child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))),
+                  child: Center(
+                      child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2))),
                 );
               } else if (snapshot.hasError) {
                 return Icon(Icons.error, color: Colors.red);
@@ -98,7 +103,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         value: lang,
                         child: Text(
                           '${lang.language} (${lang.version})',
-                          style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+                          style: TextStyle(
+                              color:
+                                  Theme.of(context).textTheme.bodyLarge?.color),
                         ),
                       );
                     }).toList(),
@@ -114,23 +121,28 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          SizedBox(width: 10,),
-          !isLoading?IconButton(
-            onPressed: _runcode,
-            icon: Icon(Icons.play_arrow,),
-          ):SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(
-              color: Colors.grey,
-            ),
+          SizedBox(
+            width: 10,
           ),
+          !isLoading
+              ? IconButton(
+                  onPressed: _runcode,
+                  icon: Icon(
+                    Icons.play_arrow,
+                  ),
+                )
+              : SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.grey,
+                  ),
+                ),
           IconButton(
-            onPressed: (){
+            onPressed: () {
               setState(() {
-                isSideBarOn=!isSideBarOn;
+                isSideBarOn = !isSideBarOn;
               });
-
             },
             icon: Icon(Icons.view_sidebar),
           ),
@@ -138,44 +150,65 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
         padding: EdgeInsets.all(16.0),
-        child:Row(
+        child: Row(
           children: [
             Expanded(
               flex: 2,
               child: Editor(code: _codeController),
             ),
             SizedBox(width: 16.0),
-            isSideBarOn ? Expanded(
-              flex: 1,
-              child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _inputController,
-                  keyboardType: TextInputType.multiline,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Input',
-                  ),
-                  maxLines: null,
-                  
-                ),
-                SizedBox(height: 10.0),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.all(16.0),
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),                    
-                    ),
+            isSideBarOn
+                ? Expanded(
+                    flex: 1,
                     child: SingleChildScrollView(
-                      child: Text(_output, style: TextStyle(fontFamily: 'Courier', fontSize: 16)),
-                    ),
-                  ),
-                ),
-              ],
-            )): Text("")
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: _inputController,
+                            keyboardType: TextInputType.multiline,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade300),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey.shade300),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                    color:
+                                        Colors.grey.shade300), // same as enabled
+                              ),
+                              hintText: "Input",
+                            ),
+                            maxLines: null,
+                            minLines: 2,
+                          ),
+                          SizedBox(height: 10.0),
+                          Container(
+                              padding: EdgeInsets.all(16.0),
+                              width: double.infinity,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: SingleChildScrollView(
+                                child: Text(_output,
+                                    style: TextStyle(
+                                        fontFamily: 'Courier', fontSize: 16)),
+                              ),
+                            ),
+                          
+                        ],
+                      ),
+                    ))
+                : Text("")
           ],
         ),
       ),
