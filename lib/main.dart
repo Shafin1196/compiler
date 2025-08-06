@@ -4,6 +4,7 @@ import 'package:compiler/models/language.dart';
 import 'package:compiler/models/output.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,12 +46,17 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController _codeController = TextEditingController();
   TextEditingController _inputController = TextEditingController();
   String _output = "Output will be displayed here";
+  bool isSideBarOn=true;
+  bool isLoading=false;
   @override
   void initState() {
     super.initState();
     languagesFuture = ApiServices.fetchLanguages();
   }
   void _runcode()async{
+    setState(() {
+      isLoading=!isLoading;
+    });
     OutputResult outputResult=await ApiServices.runCode(
       language: selectedLanguage!,
       code: _codeController.text,
@@ -60,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _output = outputResult.run.output.isNotEmpty
           ? outputResult.run.output
           : outputResult.run.stderr;
+      isLoading=!isLoading;
     });
   }
 
@@ -111,10 +118,26 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
           ),
-          IconButton(
+          SizedBox(width: 10,),
+          !isLoading?IconButton(
             onPressed: _runcode,
             icon: Icon(Icons.play_arrow,),
-          )
+          ):SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(
+              color: Colors.grey,
+            ),
+          ),
+          IconButton(
+            onPressed: (){
+              setState(() {
+                isSideBarOn=!isSideBarOn;
+              });
+
+            },
+            icon: Icon(Icons.view_sidebar),
+          ),
         ],
       ),
       body: Container(
@@ -126,13 +149,14 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Editor(code: _codeController),
             ),
             SizedBox(width: 16.0),
-            Expanded(
+            isSideBarOn ? Expanded(
               flex: 1,
               child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
                   controller: _inputController,
+                  keyboardType: TextInputType.multiline,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Input',
@@ -140,14 +164,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   maxLines: null,
                   
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: 10.0),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.all(16.0),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8.0),
+                      borderRadius: BorderRadius.circular(8.0),                    
                     ),
                     child: SingleChildScrollView(
                       child: Text(_output, style: TextStyle(fontFamily: 'Courier', fontSize: 16)),
@@ -155,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ],
-            )),
+            )): Text("")
           ],
         ),
       ),
