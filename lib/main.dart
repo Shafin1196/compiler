@@ -1,11 +1,9 @@
 import 'package:compiler/api_services.dart';
 import 'package:compiler/editor.dart';
 import 'package:compiler/models/language.dart';
-import 'package:compiler/models/output.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
@@ -57,15 +55,13 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       isLoading=!isLoading;
     });
-    OutputResult outputResult=await ApiServices.runCode(
+    final outputResult=await ApiServices.runCode(
       language: selectedLanguage!,
       code: _codeController.text,
       input: _inputController.text,
     );
     setState(() {
-      _output = outputResult.run.output.isNotEmpty
-          ? outputResult.run.output
-          : outputResult.run.stderr;
+      _output = outputResult;
       isLoading=!isLoading;
     });
   }

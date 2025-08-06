@@ -1,5 +1,4 @@
 import 'package:compiler/models/language.dart';
-import 'package:compiler/models/output.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -16,7 +15,7 @@ class ApiServices {
     }
   }
 
-  static Future<OutputResult> runCode({
+  static Future<String> runCode({
     required Language language,
     required String code,
     required String input,
@@ -44,7 +43,10 @@ class ApiServices {
       );
 
       if (response.statusCode == 200) {
-        return OutputResult.fromJson(json.decode(response.body));
+        final Map<String, dynamic> result = json.decode(response.body);
+        return result['run']['stdout'].isNotEmpty?
+            result['run']['stdout'] :
+            result['run']['stderr'].isNotEmpty ? result['run']['stderr'] : "No output";
       } else {
         throw Exception('Failed to run code');
       }
