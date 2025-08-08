@@ -171,68 +171,70 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Editor(code: _codeController),
-            ),
-            SizedBox(width: 16.0),
-            isSideBarOn
-                ? Expanded(
-                    flex: 1,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextField(
-                            controller: _inputController,
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade300),
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Editor(code: _codeController),
+              ),
+              SizedBox(width: 16.0),
+              isSideBarOn
+                  ? Expanded(
+                      flex: 1,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextField(
+                              controller: _inputController,
+                              keyboardType: TextInputType.multiline,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade300),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide:
+                                      BorderSide(color: Colors.grey.shade300),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide(
+                                      color:
+                                          Colors.grey.shade300), // same as enabled
+                                ),
+                                hintText: "Input",
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide:
-                                    BorderSide(color: Colors.grey.shade300),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color:
-                                        Colors.grey.shade300), // same as enabled
-                              ),
-                              hintText: "Input",
+                              maxLines: null,
+                              minLines: 2,
                             ),
-                            maxLines: null,
-                            minLines: 2,
-                          ),
-                          SizedBox(height: 10.0),
-                          Container(
-                              padding: EdgeInsets.all(16.0),
-                              width: double.infinity,
-                              height:200,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(8.0),
+                            SizedBox(height: 10.0),
+                            Container(
+                                padding: EdgeInsets.all(16.0),
+                                width: double.infinity,
+                                height:200,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: SingleChildScrollView(
+                                  child: Text(_output,
+                                      style: TextStyle(
+                                          fontFamily: 'Courier', fontSize: 16)),
+                                ),
                               ),
-                              child: SingleChildScrollView(
-                                child: Text(_output,
-                                    style: TextStyle(
-                                        fontFamily: 'Courier', fontSize: 16)),
-                              ),
-                            ),
-                          
-                        ],
-                      ),
-                    ))
-                : Text("")
-          ],
+                            
+                          ],
+                        ),
+                      ))
+                  : Text("")
+            ],
+          ),
         ),
       ),
       drawer: Drawer(
