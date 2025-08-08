@@ -15,6 +15,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -113,7 +115,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           child: CircularProgressIndicator(strokeWidth: 2))),
                 );
               } else if (snapshot.hasError) {
-                return Icon(Icons.error, color: Colors.red);
+                return IconButton(
+                  onPressed: () {
+                    setState(() {
+                      languagesFuture = ApiServices.fetchLanguages();
+                    });
+                  },
+                  icon: Icon(Icons.refresh_sharp, color: Colors.red),
+                );
               } else if (snapshot.hasData) {
                 final languages = snapshot.data!;
                 return DropdownButtonHideUnderline(
